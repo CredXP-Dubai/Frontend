@@ -20,20 +20,17 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     }
   }, [isAuthenticated, loading, pathname, router, searchParams]);
 
-  if (loading) {
+  if (loading || !isAuthenticated) {
     return (
-      <div className="auth-loading" aria-live="polite" aria-busy="true">
-        <div className="auth-loading__spinner" />
-        <p>Restoring your session…</p>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="auth-loading" aria-live="polite" aria-busy="true">
-        <div className="auth-loading__spinner" />
-        <p>Redirecting to sign in…</p>
+      <div
+        className="flex min-h-screen flex-col items-center justify-center gap-4 bg-white"
+        aria-live="polite"
+        aria-busy="true"
+      >
+        <div className="h-10 w-10 animate-spin rounded-full border-2 border-black/10 border-t-[#C8102E]" />
+        <p className="text-sm tracking-wide text-black/55">
+          {loading ? "Restoring your session…" : "Redirecting to sign in…"}
+        </p>
       </div>
     );
   }

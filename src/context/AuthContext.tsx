@@ -113,7 +113,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!isValidEmail(payload.email)) {
         throw new ApiError("Enter a valid email address", 400, "VALIDATION_ERROR");
       }
-      if (!isStrongPassword(payload.password)) {
+      if (payload.password.length < 8) {
         throw new ApiError("Password must be at least 8 characters", 400, "VALIDATION_ERROR");
       }
 
@@ -135,7 +135,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw new ApiError("Enter a valid email address", 400, "VALIDATION_ERROR");
     }
     if (!isStrongPassword(payload.password)) {
-      throw new ApiError("Password must be at least 8 characters", 400, "VALIDATION_ERROR");
+      throw new ApiError(
+        "Password must be at least 8 characters and include uppercase, lowercase, and a number",
+        400,
+        "VALIDATION_ERROR",
+      );
     }
     if (!passwordsMatch(payload.password, payload.confirmPassword)) {
       throw new ApiError("Passwords do not match", 400, "VALIDATION_ERROR");
@@ -175,7 +179,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new ApiError("Reset token is missing or invalid", 400, "VALIDATION_ERROR");
       }
       if (!isStrongPassword(payload.password)) {
-        throw new ApiError("Password must be at least 8 characters", 400, "VALIDATION_ERROR");
+        throw new ApiError(
+          "Password must be at least 8 characters and include uppercase, lowercase, and a number",
+          400,
+          "VALIDATION_ERROR",
+        );
       }
       if (!passwordsMatch(payload.password, payload.confirmPassword)) {
         throw new ApiError("Passwords do not match", 400, "VALIDATION_ERROR");

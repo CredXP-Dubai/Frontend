@@ -5,7 +5,7 @@ import { LoginForm } from "@/components/auth/LoginForm";
 function LoginFormFallback() {
   return (
     <div className="flex items-center justify-center py-12">
-      <div className="h-6 w-6 animate-spin rounded-full border-2 border-luxury-gold/20 border-t-luxury-gold" />
+      <div className="h-6 w-6 animate-spin rounded-full border-2 border-black/10 border-t-[#C8102E]" />
     </div>
   );
 }

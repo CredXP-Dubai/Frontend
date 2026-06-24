@@ -18,11 +18,11 @@ function getPasswordStrength(password: string): { level: StrengthLevel; label: s
 }
 
 const barColors = [
-  "bg-white/10",
-  "bg-red-400/70",
-  "bg-amber-400/80",
-  "bg-luxury-gold/80",
-  "bg-luxury-gold-light",
+  "bg-black/10",
+  "bg-red-300",
+  "bg-red-400",
+  "bg-[#E63946]",
+  "bg-[#C8102E]",
 ];
 
 interface PasswordStrengthProps {
@@ -46,14 +46,14 @@ export function PasswordStrength({ password }: PasswordStrengthProps) {
           <div
             key={segment}
             className={`h-1 flex-1 rounded-full transition-colors duration-300 ${
-              level >= segment ? barColors[level] : "bg-white/10"
+              level >= segment ? barColors[level] : "bg-black/10"
             }`}
           />
         ))}
       </div>
-      <p className="text-xs tracking-wide text-luxury-muted">
+      <p className="text-xs tracking-wide text-black/45">
         Password strength:{" "}
-        <span className="text-luxury-gold-light">{label || "Too short"}</span>
+        <span className="font-medium text-[#C8102E]">{label || "Too short"}</span>
       </p>
     </motion.div>
   );

@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Inter } from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";
 import { AppProviders } from "@/components/providers/AppProviders";
 import { Navbar } from "@/components/layout/Navbar";
 import "./globals.css";
 
-const cormorant = Cormorant_Garamond({
+const playfair = Playfair_Display({
   variable: "--font-display",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
+  weight: ["400", "500", "600"],
   display: "swap",
 });
 
@@ -18,9 +18,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "CredXP Dubai | Exclusive Properties",
+  title: "CredXP Dubai | Exclusive Luxury Real Estate",
   description:
-    "Invest in Dubai's iconic developments from the world's leading developers.",
+    "Invest in Dubai's most prestigious properties from the world's leading developers.",
 };
 
 export default function RootLayout({
@@ -29,8 +29,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${cormorant.variable} ${inter.variable} h-full`}>
-      <body className="min-h-full bg-black text-white antialiased">
+    <html lang="en" className={`${playfair.variable} ${inter.variable} h-full`}>
+      <body className="min-h-full bg-white text-black antialiased">
         <AppProviders>
           <Navbar />
           {children}

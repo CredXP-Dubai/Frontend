@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import type { PropertyListParams } from "@/types/api";
+import { Button } from "@/components/ui/Button";
+import { theme } from "@/styles/theme";
 
 interface PropertySearchProps {
   onSearch: (params: PropertyListParams) => void;
@@ -29,14 +31,20 @@ export function PropertySearch({ onSearch, isSearching }: PropertySearchProps) {
   };
 
   return (
-    <form className="property-search" onSubmit={handleSubmit}>
-      <div className="property-search__row">
+    <form
+      onSubmit={handleSubmit}
+      className="rounded-2xl border border-black/10 bg-[#F7F7F7] p-5 md:p-6"
+    >
+      <p className="mb-4 text-[0.6875rem] font-semibold tracking-[0.22em] text-[#C8102E] uppercase">
+        Refine Your Search
+      </p>
+      <div className="grid gap-3 md:grid-cols-2">
         <input
           type="search"
-          placeholder="Search properties…"
+          placeholder="Search properties"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="property-search__input"
+          className={theme.components.input.light}
           aria-label="Search properties"
         />
         <input
@@ -44,46 +52,40 @@ export function PropertySearch({ onSearch, isSearching }: PropertySearchProps) {
           placeholder="Location"
           value={location}
           onChange={(e) => setLocation(e.target.value)}
-          className="property-search__input"
+          className={theme.components.input.light}
           aria-label="Location"
         />
-      </div>
-      <div className="property-search__row">
         <input
           type="number"
-          placeholder="Min price"
+          placeholder="Min price (AED)"
           value={minPrice}
           onChange={(e) => setMinPrice(e.target.value)}
-          className="property-search__input"
+          className={theme.components.input.light}
           aria-label="Minimum price"
         />
         <input
           type="number"
-          placeholder="Max price"
+          placeholder="Max price (AED)"
           value={maxPrice}
           onChange={(e) => setMaxPrice(e.target.value)}
-          className="property-search__input"
+          className={theme.components.input.light}
           aria-label="Maximum price"
         />
         <select
           value={bedrooms}
           onChange={(e) => setBedrooms(e.target.value)}
-          className="property-search__input"
+          className={theme.components.input.light}
           aria-label="Bedrooms"
         >
-          <option value="">Any beds</option>
+          <option value="">Any bedrooms</option>
           <option value="1">1+</option>
           <option value="2">2+</option>
           <option value="3">3+</option>
           <option value="4">4+</option>
         </select>
-        <button
-          type="submit"
-          className="property-search__btn"
-          disabled={isSearching}
-        >
-          {isSearching ? "Searching…" : "Search"}
-        </button>
+        <Button type="submit" variant="primary" disabled={isSearching} className="w-full">
+          {isSearching ? "Searching…" : "Search Properties"}
+        </Button>
       </div>
     </form>
   );

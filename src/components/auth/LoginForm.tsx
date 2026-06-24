@@ -6,7 +6,6 @@ import { FormEvent, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
 import { getErrorMessage } from "@/lib/auth/utils";
-import { authCapabilities } from "@/lib/api/auth";
 import { AuthFloatingInput } from "./AuthFloatingInput";
 import { AuthGoldButton } from "./AuthGoldButton";
 
@@ -83,23 +82,18 @@ export function LoginForm() {
       <div className="flex flex-col items-center gap-3 pt-1 sm:flex-row sm:justify-between">
         <Link
           href="/forgot-password"
-          className="text-sm text-luxury-gold transition-colors hover:text-luxury-gold-light"
+          className="text-sm font-medium text-[#C8102E] transition-colors hover:text-black"
         >
           Forgot Password
         </Link>
         <Link
           href="/register"
-          className="text-sm text-luxury-muted transition-colors hover:text-white"
+          className="text-sm text-black/65 transition-colors hover:text-[#C8102E]"
         >
           Create Account
         </Link>
       </div>
 
-      {!authCapabilities.forgotPassword && (
-        <p className="text-center text-xs leading-relaxed text-luxury-muted/70">
-          Password recovery is not published on the current backend API yet.
-        </p>
-      )}
     </form>
   );
 }

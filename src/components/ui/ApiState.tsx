@@ -1,6 +1,7 @@
 "use client";
 
 import { ApiError } from "@/lib/api/client";
+import { theme } from "@/styles/theme";
 
 interface ApiStateProps {
   isLoading: boolean;
@@ -23,11 +24,16 @@ export function ApiState({
   emptyMessage = "No results found.",
   children,
 }: ApiStateProps) {
+  const panelClass = `${theme.components.card.base} px-6 py-16 text-center`;
+
   if (isLoading) {
     return (
-      <div className="api-state api-state--loading" role="status">
-        <div className="api-state__spinner" aria-hidden="true" />
-        <p>{loadingMessage}</p>
+      <div className={panelClass} role="status">
+        <div
+          className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-black/10 border-t-[#C8102E]"
+          aria-hidden="true"
+        />
+        <p className="text-sm text-black/55">{loadingMessage}</p>
       </div>
     );
   }
@@ -37,17 +43,16 @@ export function ApiState({
     const isNotFound = apiError?.isNotFound;
 
     return (
-      <div className="api-state api-state--error" role="alert">
-        <p className="api-state__title">
-          {isNotFound ? "API not available" : "Something went wrong"}
+      <div className={panelClass} role="alert">
+        <p className="font-[family-name:var(--font-display)] text-2xl text-black">
+          {isNotFound ? "Collection Unavailable" : "Unable to Load"}
         </p>
-        <p className="api-state__message">
+        <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-black/55">
           {apiError?.message ?? "Unable to load data from the server."}
         </p>
         {isNotFound && (
-          <p className="api-state__hint">
-            This endpoint is not yet deployed on the backend (v0.3.0). Listings
-            will appear here once the API is live.
+          <p className="mx-auto mt-4 max-w-md text-xs leading-relaxed text-[#C8102E]">
+            This endpoint is not yet deployed on the backend. Listings will appear here once live.
           </p>
         )}
       </div>
@@ -56,9 +61,9 @@ export function ApiState({
 
   if (isEmpty) {
     return (
-      <div className="api-state api-state--empty">
-        <p className="api-state__title">{emptyTitle}</p>
-        <p className="api-state__message">{emptyMessage}</p>
+      <div className={panelClass}>
+        <p className="font-[family-name:var(--font-display)] text-2xl text-black">{emptyTitle}</p>
+        <p className="mx-auto mt-3 max-w-md text-sm text-black/55">{emptyMessage}</p>
       </div>
     );
   }

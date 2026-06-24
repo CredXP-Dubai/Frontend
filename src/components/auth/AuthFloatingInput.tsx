@@ -67,8 +67,8 @@ export function AuthFloatingInput({
           error
             ? "border-red-400/50"
             : focused
-              ? "border-luxury-gold/70 shadow-[0_0_0_1px_rgb(212_175_55/0.35),0_0_24px_rgb(212_175_55/0.12)]"
-              : "border-luxury-border"
+              ? "border-[#C8102E]/70 shadow-[0_0_0_1px_rgba(200,16,46,0.2)]"
+              : "border-black/10"
         }`}
         animate={focused ? { scale: 1.01 } : { scale: 1 }}
         transition={{ duration: 0.25 }}
@@ -85,15 +85,15 @@ export function AuthFloatingInput({
         required={required}
         minLength={minLength}
         placeholder=" "
-        className="peer relative z-10 w-full rounded-xl border-0 bg-white/3 px-4 pt-6 pb-3 text-white outline-none transition-colors duration-300 placeholder-transparent autofill:shadow-[inset_0_0_0_1000px_rgb(5_5_5/0.95)] autofill:[-webkit-text-fill-color:white]"
+        className="peer relative z-10 w-full rounded-xl border-0 bg-[#F7F7F7] px-4 pt-6 pb-3 text-black outline-none transition-colors duration-300 placeholder-transparent autofill:shadow-[inset_0_0_0_1000px_#f7f7f7] autofill:[-webkit-text-fill-color:black]"
       />
 
       <label
         htmlFor={inputId}
         className={`pointer-events-none absolute left-4 z-20 origin-left transition-all duration-300 ${
           floated
-            ? "top-2.5 translate-y-0 text-[0.65rem] tracking-[0.14em] text-luxury-gold uppercase"
-            : "top-1/2 -translate-y-1/2 text-sm text-luxury-muted"
+            ? "top-2.5 translate-y-0 text-[0.65rem] tracking-[0.14em] text-[#C8102E] uppercase"
+            : "top-1/2 -translate-y-1/2 text-sm text-black/45"
         }`}
       >
         {label}
@@ -103,7 +103,7 @@ export function AuthFloatingInput({
         <button
           type="button"
           onClick={() => setShowPassword((visible) => !visible)}
-          className="absolute top-1/2 right-3 z-20 -translate-y-1/2 rounded-lg p-1.5 text-luxury-muted transition-colors hover:text-luxury-gold-light"
+          className="absolute top-1/2 right-3 z-20 -translate-y-1/2 rounded-lg p-1.5 text-black/45 transition-colors hover:text-[#C8102E]"
           aria-label={showPassword ? "Hide password" : "Show password"}
         >
           <EyeIcon open={showPassword} />

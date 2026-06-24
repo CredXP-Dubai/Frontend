@@ -2,31 +2,22 @@ import { CinematicHero } from "@/components/hero";
 import { FeaturedProperties } from "@/components/properties/FeaturedProperties";
 import { PropertyListings } from "@/components/properties/PropertyListings";
 import { DevelopersSection } from "@/components/developers/DevelopersSection";
-import { BackendStatus } from "@/components/ui/BackendStatus";
+import { ConsultationSection } from "@/components/home/ConsultationSection";
+import { Footer } from "@/components/layout/Footer";
 
 export default function Home() {
   return (
-    <main className="relative bg-black">
+    <main className="relative bg-white">
       <CinematicHero />
 
-      <div className="site-content">
-        <BackendStatus />
+      <div className="relative bg-white">
         <FeaturedProperties />
         <PropertyListings />
         <DevelopersSection />
-
-        <section
-          id="consultation"
-          className="consultation-section"
-        >
-          <p className="section-eyebrow">Private Advisory</p>
-          <h2 className="section-heading">Book a Consultation</h2>
-          <p className="section-subheading">
-            Speak with our Dubai property specialists about exclusive
-            off-plan and ready investments.
-          </p>
-        </section>
+        <ConsultationSection />
       </div>
+
+      <Footer />
     </main>
   );
 }

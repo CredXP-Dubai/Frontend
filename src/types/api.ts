@@ -5,11 +5,17 @@
 
 // ─── Error envelope ───────────────────────────────────────────────────────────
 
+export interface ApiErrorDetails {
+  formErrors?: string[];
+  fieldErrors?: Record<string, string[]>;
+}
+
 export interface ApiErrorBody {
   error: {
     code: string;
     message: string;
     correlationId?: string;
+    details?: ApiErrorDetails;
   };
 }
 
@@ -65,6 +71,13 @@ export interface CreateUserRequest {
   password: string;
   firstName?: string;
   lastName?: string;
+}
+
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
 }
 
 // ─── Users (GET /api/v1/users) ──────────────────────────────────────────────────

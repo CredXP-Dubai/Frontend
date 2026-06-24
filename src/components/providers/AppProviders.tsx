@@ -12,20 +12,20 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
           position="top-right"
           toastOptions={{
             style: {
-              background: "#111",
-              color: "#f5e6c8",
-              border: "1px solid rgba(201, 169, 98, 0.35)",
+              background: "#ffffff",
+              color: "#000000",
+              border: "1px solid rgba(0, 0, 0, 0.1)",
             },
             success: {
               iconTheme: {
-                primary: "#c9a962",
-                secondary: "#111",
+                primary: "#C8102E",
+                secondary: "#ffffff",
               },
             },
             error: {
               iconTheme: {
-                primary: "#f87171",
-                secondary: "#111",
+                primary: "#C8102E",
+                secondary: "#ffffff",
               },
             },
           }}

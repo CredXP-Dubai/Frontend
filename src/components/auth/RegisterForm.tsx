@@ -5,11 +5,7 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
-import {
-  getErrorMessage,
-  isValidEmail,
-  passwordsMatch,
-} from "@/lib/auth/utils";
+import { getErrorMessage, getPasswordRequirementsHint, isValidEmail, passwordsMatch } from "@/lib/auth/utils";
 import { AuthFloatingInput } from "./AuthFloatingInput";
 import { AuthGoldButton } from "./AuthGoldButton";
 import { PasswordStrength } from "./PasswordStrength";
@@ -150,7 +146,7 @@ export function RegisterForm() {
         </div>
       </div>
 
-      <label className="group flex cursor-pointer items-start gap-3 rounded-xl border border-luxury-border bg-white/2 px-4 py-3 transition-colors hover:border-luxury-gold/25">
+      <label className="group flex cursor-pointer items-start gap-3 rounded-xl border border-black/10 bg-[#F7F7F7] px-4 py-3 transition-colors hover:border-[#C8102E]/30">
         <span className="relative mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center">
           <input
             type="checkbox"
@@ -158,10 +154,10 @@ export function RegisterForm() {
             onChange={(event) => setAgreedToTerms(event.target.checked)}
             className="peer sr-only"
           />
-          <span className="h-5 w-5 rounded border border-luxury-border bg-white/3 transition-all peer-checked:border-luxury-gold peer-checked:bg-luxury-gold/20 peer-focus-visible:ring-2 peer-focus-visible:ring-luxury-gold/50" />
+          <span className="h-5 w-5 rounded border border-black/15 bg-white transition-all peer-checked:border-[#C8102E] peer-checked:bg-[#C8102E]/10 peer-focus-visible:ring-2 peer-focus-visible:ring-[#C8102E]/40" />
           <svg
             viewBox="0 0 12 10"
-            className="pointer-events-none absolute h-2.5 w-3 text-luxury-gold-light opacity-0 transition-opacity peer-checked:opacity-100"
+            className="pointer-events-none absolute h-2.5 w-3 text-[#C8102E] opacity-0 transition-opacity peer-checked:opacity-100"
             aria-hidden="true"
           >
             <path
@@ -174,9 +170,9 @@ export function RegisterForm() {
             />
           </svg>
         </span>
-        <span className="text-sm leading-relaxed text-luxury-muted">
+        <span className="text-sm leading-relaxed text-black/65">
           I agree to the{" "}
-          <span className="text-luxury-gold-light underline decoration-luxury-gold/40 underline-offset-2">
+          <span className="font-medium text-[#C8102E] underline decoration-[#C8102E]/30 underline-offset-2">
             Terms &amp; Conditions
           </span>
         </span>
@@ -201,11 +197,15 @@ export function RegisterForm() {
         {submitting ? "Creating Account…" : "Create Account"}
       </AuthGoldButton>
 
-      <p className="text-center text-sm text-luxury-muted">
+      <p className="text-center text-xs leading-relaxed text-black/45">
+        {getPasswordRequirementsHint()}
+      </p>
+
+      <p className="text-center text-sm text-black/65">
         Already have an account?{" "}
         <Link
           href="/login"
-          className="text-luxury-gold transition-colors hover:text-luxury-gold-light"
+          className="font-medium text-[#C8102E] transition-colors hover:text-black"
         >
           Sign In
         </Link>

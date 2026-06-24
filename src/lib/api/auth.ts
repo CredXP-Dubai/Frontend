@@ -1,11 +1,11 @@
 import { apiClient, ApiError } from "./client";
-import { createUser } from "./users";
+import { logAuthDebug } from "./authDebug";
 import type {
   AuthTokenResponse,
-  CreateUserRequest,
   LoginRequest,
   LogoutRequest,
   RefreshTokenRequest,
+  RegisterRequest,
   User,
 } from "@/types/api";
 import type {
@@ -18,11 +18,44 @@ import type {
 const AUTH_BASE = "/api/v1/auth";
 
 const AUTH_CAPABILITY_PATHS = {
-  register: "/api/v1/users",
+  register: "/api/v1/auth/register",
   forgotPassword: "/api/v1/auth/forgot-password",
   resetPassword: "/api/v1/auth/reset-password",
   verifyEmail: "/api/v1/auth/verify-email",
 } as const;
+
+function normalizeAuthTokenResponse(data: unknown): AuthTokenResponse {
+  if (!data || typeof data !== "object") {
+    throw new ApiError("Unexpected authentication response shape", 500, "INVALID_RESPONSE");
+  }
+
+  const record = data as Record<string, unknown>;
+
+  const accessToken =
+    (record.accessToken as string | undefined) ??
+    (record.token as string | undefined) ??
+    (record.jwt as string | undefined) ??
+    ((record.data as Record<string, unknown> | undefined)?.accessToken as string | undefined) ??
+    ((record.data as Record<string, unknown> | undefined)?.token as string | undefined);
+
+  if (!accessToken) {
+    logAuthDebug("Unexpected token response keys", Object.keys(record));
+    throw new ApiError(
+      "Authentication response did not include an access token",
+      500,
+      "INVALID_RESPONSE",
+    );
+  }
+
+  return {
+    accessToken,
+    refreshToken:
+      (record.refreshToken as string | undefined) ??
+      ((record.data as Record<string, unknown> | undefined)?.refreshToken as string | undefined),
+    expiresIn: Number(record.expiresIn ?? 900),
+    tokenType: String(record.tokenType ?? "Bearer"),
+  };
+}
 
 function unsupportedAuthFeature(feature: string, path: string): ApiError {
   return new ApiError(
@@ -33,23 +66,48 @@ function unsupportedAuthFeature(feature: string, path: string): ApiError {
 }
 
 export async function login(payload: LoginRequest): Promise<AuthTokenResponse> {
+  const requestBody = {
+    email: payload.email.trim(),
+    password: payload.password,
+  };
+
+  logAuthDebug("login() payload", {
+    endpoint: `${AUTH_BASE}/login`,
+    body: requestBody,
+    credentialsMode: "same-origin (axios default; tokens returned in JSON body)",
+  });
+
   const { data } = await apiClient.post<AuthTokenResponse>(
     `${AUTH_BASE}/login`,
-    payload,
+    requestBody,
   );
-  return data;
+
+  const tokens = normalizeAuthTokenResponse(data);
+  logAuthDebug("login() tokens parsed", {
+    hasAccessToken: Boolean(tokens.accessToken),
+    hasRefreshToken: Boolean(tokens.refreshToken),
+    expiresIn: tokens.expiresIn,
+    tokenType: tokens.tokenType,
+  });
+
+  return tokens;
 }
 
-export async function register(payload: RegisterFormValues): Promise<User> {
+export async function register(payload: RegisterFormValues): Promise<void> {
   const [firstName, ...rest] = payload.name.trim().split(/\s+/);
-  const request: CreateUserRequest = {
+  const request: RegisterRequest = {
     email: payload.email.trim(),
     password: payload.password,
     firstName,
-    lastName: rest.join(" ") || undefined,
+    lastName: rest.join(" ") || firstName,
   };
 
-  return createUser(request);
+  logAuthDebug("register() payload", {
+    endpoint: `${AUTH_BASE}/register`,
+    body: { ...request, password: "[redacted]" },
+  });
+
+  await apiClient.post(`${AUTH_BASE}/register`, request);
 }
 
 export async function refreshToken(
@@ -59,7 +117,7 @@ export async function refreshToken(
     `${AUTH_BASE}/refresh`,
     payload,
   );
-  return data;
+  return normalizeAuthTokenResponse(data);
 }
 
 export async function logout(payload?: LogoutRequest): Promise<void> {
@@ -130,9 +188,9 @@ export const authCapabilities = {
   logout: true,
   refresh: true,
   currentUser: true,
-  registerViaUsersApi: true,
-  forgotPassword: false,
-  resetPassword: false,
-  verifyEmail: false,
+  registerViaAuthApi: true,
+  forgotPassword: true,
+  resetPassword: true,
+  verifyEmail: true,
   paths: AUTH_CAPABILITY_PATHS,
 } as const;

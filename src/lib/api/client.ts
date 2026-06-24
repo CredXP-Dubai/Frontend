@@ -5,6 +5,8 @@ import axios, {
 } from "axios";
 import type { ApiErrorBody } from "@/types/api";
 import type { AuthTokenResponse } from "@/types/api";
+import { formatApiErrorMessage } from "@/lib/api/errorMessages";
+import { isAuthDebugEnabled, logAuthDebug } from "@/lib/api/authDebug";
 import {
   clearAuthSession,
   getAccessToken,
@@ -23,18 +25,24 @@ export class ApiError extends Error {
   readonly status: number;
   readonly code: string;
   readonly correlationId?: string;
+  readonly details?: import("@/types/api").ApiErrorDetails;
+  readonly rawBody?: unknown;
 
   constructor(
     message: string,
     status: number,
     code: string,
     correlationId?: string,
+    details?: import("@/types/api").ApiErrorDetails,
+    rawBody?: unknown,
   ) {
     super(message);
     this.name = "ApiError";
     this.status = status;
     this.code = code;
     this.correlationId = correlationId;
+    this.details = details;
+    this.rawBody = rawBody;
   }
 
   get isNotFound(): boolean {
@@ -56,10 +64,12 @@ export function parseApiError(error: unknown): ApiError {
 
     if (body?.error) {
       return new ApiError(
-        body.error.message,
+        formatApiErrorMessage(body),
         status,
         body.error.code,
         body.error.correlationId,
+        body.error.details,
+        body,
       );
     }
 
@@ -91,12 +101,47 @@ type RetryableRequestConfig = InternalAxiosRequestConfig & {
 
 let refreshPromise: Promise<string | null> | null = null;
 
+const PUBLIC_AUTH_PATHS = [
+  "/api/v1/auth/login",
+  "/api/v1/auth/register",
+  "/api/v1/auth/refresh",
+  "/api/v1/auth/forgot-password",
+  "/api/v1/auth/reset-password",
+  "/api/v1/auth/verify-email",
+  "/api/v1/auth/resend-verification",
+] as const;
+
+function isPublicAuthRoute(url?: string): boolean {
+  if (!url) return false;
+  return PUBLIC_AUTH_PATHS.some((path) => url.includes(path));
+}
+
 function attachAuthHeader(config: InternalAxiosRequestConfig): InternalAxiosRequestConfig {
+  if (isPublicAuthRoute(config.url)) {
+    return config;
+  }
+
   const token = getAccessToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
+}
+
+function logOutgoingRequest(config: InternalAxiosRequestConfig): void {
+  if (!isAuthDebugEnabled()) return;
+
+  logAuthDebug("Request", {
+    method: config.method?.toUpperCase(),
+    url: `${config.baseURL ?? ""}${config.url ?? ""}`,
+    headers: {
+      "Content-Type": config.headers["Content-Type"],
+      Accept: config.headers.Accept,
+      Authorization: config.headers.Authorization ? "Bearer [redacted]" : undefined,
+    },
+    withCredentials: config.withCredentials ?? false,
+    data: config.data,
+  });
 }
 
 async function refreshAccessToken(): Promise<string | null> {
@@ -128,11 +173,33 @@ export const apiClient: AxiosInstance = axios.create({
   },
 });
 
-apiClient.interceptors.request.use(attachAuthHeader);
+apiClient.interceptors.request.use((config) => {
+  const next = attachAuthHeader(config);
+  logOutgoingRequest(next);
+  return next;
+});
 
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    if (isAuthDebugEnabled() && response.config.url?.includes("/auth/")) {
+      logAuthDebug("Response", {
+        status: response.status,
+        url: response.config.url,
+        data: response.data,
+      });
+    }
+    return response;
+  },
   async (error: AxiosError<ApiErrorBody>) => {
+    if (isAuthDebugEnabled()) {
+      logAuthDebug("Error", {
+        status: error.response?.status,
+        url: error.config?.url,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+
     const apiError = parseApiError(error);
     const originalRequest = error.config as RetryableRequestConfig | undefined;
     const requestUrl = originalRequest?.url ?? "";
