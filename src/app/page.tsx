@@ -1,30 +1,32 @@
 import { CinematicHero } from "@/components/hero";
+import { FeaturedProperties } from "@/components/properties/FeaturedProperties";
+import { PropertyListings } from "@/components/properties/PropertyListings";
+import { DevelopersSection } from "@/components/developers/DevelopersSection";
+import { BackendStatus } from "@/components/ui/BackendStatus";
 
 export default function Home() {
   return (
     <main className="relative bg-black">
       <CinematicHero />
 
-      <section
-        id="properties"
-        className="relative z-10 min-h-screen bg-[#0a0a0a] px-6 py-32 text-center"
-      >
-        <p className="font-[family-name:var(--font-body)] text-sm uppercase tracking-[0.3em] text-[#C9A962]">
-          Coming Soon
-        </p>
-        <h2 className="mt-4 font-[family-name:var(--font-display)] text-4xl font-light text-white md:text-5xl">
-          Property Listings
-        </h2>
-      </section>
+      <div className="site-content">
+        <BackendStatus />
+        <FeaturedProperties />
+        <PropertyListings />
+        <DevelopersSection />
 
-      <section
-        id="consultation"
-        className="relative z-10 min-h-[50vh] bg-[#050505] px-6 py-24 text-center"
-      >
-        <p className="font-[family-name:var(--font-body)] text-zinc-400">
-          Book a private consultation with our Dubai specialists.
-        </p>
-      </section>
+        <section
+          id="consultation"
+          className="consultation-section"
+        >
+          <p className="section-eyebrow">Private Advisory</p>
+          <h2 className="section-heading">Book a Consultation</h2>
+          <p className="section-subheading">
+            Speak with our Dubai property specialists about exclusive
+            off-plan and ready investments.
+          </p>
+        </section>
+      </div>
     </main>
   );
 }
