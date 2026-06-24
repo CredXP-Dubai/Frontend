@@ -6,14 +6,20 @@ import { ApiState } from "@/components/ui/ApiState";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Reveal } from "@/components/ui/Reveal";
 import type { PropertyListParams } from "@/types/api";
+import { hasActiveSearchFilters } from "@/lib/search/smartSearch";
 import { PropertyCard } from "./PropertyCard";
 import { PropertySearch } from "./PropertySearch";
 
-const DEFAULT_PARAMS: PropertyListParams = { page: 1, limit: 12 };
+const DEFAULT_PARAMS: PropertyListParams = {
+  page: 1,
+  limit: 12,
+  sort: "featured,-createdAt",
+};
 
 export function PropertyListings() {
   const [params, setParams] = useState<PropertyListParams>(DEFAULT_PARAMS);
   const { data, isLoading, isFetching, isError, error } = useProperties(params);
+  const showingAll = !hasActiveSearchFilters(params);
 
   return (
     <section
@@ -23,8 +29,12 @@ export function PropertyListings() {
     >
       <SectionHeader
         eyebrow="Exclusive Collection"
-        title="Property Listings"
-        subtitle="Explore investment-grade residences across Dubai Marina, Downtown, Palm Jumeirah, and beyond."
+        title={showingAll ? "All Available Properties" : "Property Listings"}
+        subtitle={
+          showingAll
+            ? "Featured properties first, then newest listings across Dubai."
+            : "Explore investment-grade residences across Dubai Marina, Downtown, Palm Jumeirah, and beyond."
+        }
       />
 
       <Reveal className="mb-10">
@@ -51,7 +61,7 @@ export function PropertyListings() {
           ))}
         </div>
         {data?.meta && data.meta.totalPages > 1 && (
-          <p className="mt-10 text-center text-sm text-[rgba(255,255,255,0.45)]">
+          <p className="mt-10 text-center text-sm text-black/45">
             Page {data.meta.page} of {data.meta.totalPages} · {data.meta.total} properties
           </p>
         )}

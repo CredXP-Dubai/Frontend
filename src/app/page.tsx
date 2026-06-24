@@ -1,4 +1,4 @@
-import { CinematicHero } from "@/components/hero";
+import { HomeHero } from "@/components/home/HomeHero";
 import { FeaturedProperties } from "@/components/properties/FeaturedProperties";
 import { PropertyListings } from "@/components/properties/PropertyListings";
 import { DevelopersSection } from "@/components/developers/DevelopersSection";
@@ -8,7 +8,7 @@ import { Footer } from "@/components/layout/Footer";
 export default function Home() {
   return (
     <main className="relative bg-white">
-      <CinematicHero />
+      <HomeHero />
 
       <div className="relative bg-white">
         <FeaturedProperties />

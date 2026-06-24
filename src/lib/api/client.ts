@@ -6,7 +6,6 @@ import axios, {
 import type { ApiErrorBody } from "@/types/api";
 import type { AuthTokenResponse } from "@/types/api";
 import { formatApiErrorMessage } from "@/lib/api/errorMessages";
-import { isAuthDebugEnabled, logAuthDebug } from "@/lib/api/authDebug";
 import {
   clearAuthSession,
   getAccessToken,
@@ -128,22 +127,6 @@ function attachAuthHeader(config: InternalAxiosRequestConfig): InternalAxiosRequ
   return config;
 }
 
-function logOutgoingRequest(config: InternalAxiosRequestConfig): void {
-  if (!isAuthDebugEnabled()) return;
-
-  logAuthDebug("Request", {
-    method: config.method?.toUpperCase(),
-    url: `${config.baseURL ?? ""}${config.url ?? ""}`,
-    headers: {
-      "Content-Type": config.headers["Content-Type"],
-      Accept: config.headers.Accept,
-      Authorization: config.headers.Authorization ? "Bearer [redacted]" : undefined,
-    },
-    withCredentials: config.withCredentials ?? false,
-    data: config.data,
-  });
-}
-
 async function refreshAccessToken(): Promise<string | null> {
   const refreshToken = getRefreshToken();
   if (!refreshToken) return null;
@@ -173,33 +156,11 @@ export const apiClient: AxiosInstance = axios.create({
   },
 });
 
-apiClient.interceptors.request.use((config) => {
-  const next = attachAuthHeader(config);
-  logOutgoingRequest(next);
-  return next;
-});
+apiClient.interceptors.request.use((config) => attachAuthHeader(config));
 
 apiClient.interceptors.response.use(
-  (response) => {
-    if (isAuthDebugEnabled() && response.config.url?.includes("/auth/")) {
-      logAuthDebug("Response", {
-        status: response.status,
-        url: response.config.url,
-        data: response.data,
-      });
-    }
-    return response;
-  },
+  (response) => response,
   async (error: AxiosError<ApiErrorBody>) => {
-    if (isAuthDebugEnabled()) {
-      logAuthDebug("Error", {
-        status: error.response?.status,
-        url: error.config?.url,
-        data: error.response?.data,
-        message: error.message,
-      });
-    }
-
     const apiError = parseApiError(error);
     const originalRequest = error.config as RetryableRequestConfig | undefined;
     const requestUrl = originalRequest?.url ?? "";

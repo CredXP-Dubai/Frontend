@@ -4,6 +4,11 @@ import { useState } from "react";
 import type { PropertyListParams } from "@/types/api";
 import { Button } from "@/components/ui/Button";
 import { theme } from "@/styles/theme";
+import type { SupportedCurrency } from "@/lib/search/currency";
+import type { PropertyType } from "@/lib/search/budgetRanges";
+import { buildPropertySearchParams } from "@/lib/search/smartSearch";
+import { trackEvent } from "@/lib/analytics/events";
+import { SmartSearchSteps } from "./SmartSearchSteps";
 
 interface PropertySearchProps {
   onSearch: (params: PropertyListParams) => void;
@@ -11,23 +16,36 @@ interface PropertySearchProps {
 }
 
 export function PropertySearch({ onSearch, isSearching }: PropertySearchProps) {
+  const [currency, setCurrency] = useState<SupportedCurrency | "">("");
+  const [budgetRangeId, setBudgetRangeId] = useState("");
+  const [propertyType, setPropertyType] = useState<PropertyType | "">("");
   const [search, setSearch] = useState("");
   const [location, setLocation] = useState("");
-  const [minPrice, setMinPrice] = useState("");
-  const [maxPrice, setMaxPrice] = useState("");
   const [bedrooms, setBedrooms] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSearch({
+
+    const params = buildPropertySearchParams({
+      currency: currency || undefined,
+      budgetRangeId: budgetRangeId || undefined,
+      propertyType: propertyType || undefined,
       search: search || undefined,
       location: location || undefined,
-      minPrice: minPrice ? Number(minPrice) : undefined,
-      maxPrice: maxPrice ? Number(maxPrice) : undefined,
       bedrooms: bedrooms ? Number(bedrooms) : undefined,
       page: 1,
       limit: 12,
     });
+
+    trackEvent("property_search_submitted", {
+      currency: params.currency,
+      budget: params.budget,
+      type: params.type,
+      search: params.search,
+      location: params.location,
+    });
+
+    onSearch(params);
   };
 
   return (
@@ -35,6 +53,18 @@ export function PropertySearch({ onSearch, isSearching }: PropertySearchProps) {
       onSubmit={handleSubmit}
       className="rounded-2xl border border-black/10 bg-[#F7F7F7] p-5 md:p-6"
     >
+      <SmartSearchSteps
+        currency={currency}
+        budgetRangeId={budgetRangeId}
+        propertyType={propertyType}
+        onCurrencyChange={(c) => {
+          setCurrency(c);
+          if (!c) setBudgetRangeId("");
+        }}
+        onBudgetChange={setBudgetRangeId}
+        onPropertyTypeChange={setPropertyType}
+      />
+
       <p className="mb-4 text-[0.6875rem] font-semibold tracking-[0.22em] text-[#C8102E] uppercase">
         Refine Your Search
       </p>
@@ -55,22 +85,6 @@ export function PropertySearch({ onSearch, isSearching }: PropertySearchProps) {
           className={theme.components.input.light}
           aria-label="Location"
         />
-        <input
-          type="number"
-          placeholder="Min price (AED)"
-          value={minPrice}
-          onChange={(e) => setMinPrice(e.target.value)}
-          className={theme.components.input.light}
-          aria-label="Minimum price"
-        />
-        <input
-          type="number"
-          placeholder="Max price (AED)"
-          value={maxPrice}
-          onChange={(e) => setMaxPrice(e.target.value)}
-          className={theme.components.input.light}
-          aria-label="Maximum price"
-        />
         <select
           value={bedrooms}
           onChange={(e) => setBedrooms(e.target.value)}
@@ -83,7 +97,12 @@ export function PropertySearch({ onSearch, isSearching }: PropertySearchProps) {
           <option value="3">3+</option>
           <option value="4">4+</option>
         </select>
-        <Button type="submit" variant="primary" disabled={isSearching} className="w-full">
+        <Button
+          type="submit"
+          variant="primary"
+          disabled={isSearching}
+          className="w-full"
+        >
           {isSearching ? "Searching…" : "Search Properties"}
         </Button>
       </div>

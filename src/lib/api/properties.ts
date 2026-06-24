@@ -25,9 +25,3 @@ export async function getProperty(id: string): Promise<Property> {
   const { data } = await apiClient.get<Property>(`${PROPERTIES_BASE}/${id}`);
   return data;
 }
-
-export async function getFeaturedProperties(
-  limit = 6,
-): Promise<PaginatedResponse<Property>> {
-  return listProperties({ featured: true, limit, page: 1 });
-}

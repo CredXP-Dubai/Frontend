@@ -130,13 +130,17 @@ export interface PropertyListParams {
   page?: number;
   limit?: number;
   search?: string;
+  location?: string;
+  type?: string;
+  currency?: string;
+  budget?: number;
   minPrice?: number;
   maxPrice?: number;
   bedrooms?: number;
-  location?: string;
   developerId?: string;
   projectId?: string;
   featured?: boolean;
+  sort?: string;
 }
 
 export interface Developer {

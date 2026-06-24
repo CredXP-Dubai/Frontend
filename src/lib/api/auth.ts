@@ -1,5 +1,4 @@
 import { apiClient, ApiError } from "./client";
-import { logAuthDebug } from "./authDebug";
 import type {
   AuthTokenResponse,
   LoginRequest,
@@ -39,7 +38,6 @@ function normalizeAuthTokenResponse(data: unknown): AuthTokenResponse {
     ((record.data as Record<string, unknown> | undefined)?.token as string | undefined);
 
   if (!accessToken) {
-    logAuthDebug("Unexpected token response keys", Object.keys(record));
     throw new ApiError(
       "Authentication response did not include an access token",
       500,
@@ -71,26 +69,12 @@ export async function login(payload: LoginRequest): Promise<AuthTokenResponse> {
     password: payload.password,
   };
 
-  logAuthDebug("login() payload", {
-    endpoint: `${AUTH_BASE}/login`,
-    body: requestBody,
-    credentialsMode: "same-origin (axios default; tokens returned in JSON body)",
-  });
-
   const { data } = await apiClient.post<AuthTokenResponse>(
     `${AUTH_BASE}/login`,
     requestBody,
   );
 
-  const tokens = normalizeAuthTokenResponse(data);
-  logAuthDebug("login() tokens parsed", {
-    hasAccessToken: Boolean(tokens.accessToken),
-    hasRefreshToken: Boolean(tokens.refreshToken),
-    expiresIn: tokens.expiresIn,
-    tokenType: tokens.tokenType,
-  });
-
-  return tokens;
+  return normalizeAuthTokenResponse(data);
 }
 
 export async function register(payload: RegisterFormValues): Promise<void> {
@@ -101,11 +85,6 @@ export async function register(payload: RegisterFormValues): Promise<void> {
     firstName,
     lastName: rest.join(" ") || firstName,
   };
-
-  logAuthDebug("register() payload", {
-    endpoint: `${AUTH_BASE}/register`,
-    body: { ...request, password: "[redacted]" },
-  });
 
   await apiClient.post(`${AUTH_BASE}/register`, request);
 }

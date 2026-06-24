@@ -51,8 +51,7 @@ export function Navbar() {
     pathname === "/login" ||
     pathname === "/register" ||
     pathname === "/forgot-password" ||
-    pathname === "/reset-password" ||
-    pathname === "/auth-debug";
+    pathname === "/reset-password";
 
   useEffect(() => {
     if (!isHome) {
