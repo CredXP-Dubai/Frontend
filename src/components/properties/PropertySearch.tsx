@@ -1,21 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import type { PropertyListParams } from "@/types/api";
+import type { PropertyListParams } from "@/types/catalog";
 import { Button } from "@/components/ui/Button";
 import { theme } from "@/styles/theme";
 import type { SupportedCurrency } from "@/lib/search/currency";
 import type { PropertyType } from "@/lib/search/budgetRanges";
 import { buildPropertySearchParams } from "@/lib/search/smartSearch";
+import type { PropertySearchFormState } from "@/lib/search/smartSearch";
 import { trackEvent } from "@/lib/analytics/events";
 import { SmartSearchSteps } from "./SmartSearchSteps";
 
 interface PropertySearchProps {
-  onSearch: (params: PropertyListParams) => void;
+  onSearch: (params: PropertyListParams | PropertySearchFormState) => void;
   isSearching?: boolean;
+  redirectMode?: boolean;
 }
 
-export function PropertySearch({ onSearch, isSearching }: PropertySearchProps) {
+export function PropertySearch({ onSearch, isSearching, redirectMode }: PropertySearchProps) {
   const [currency, setCurrency] = useState<SupportedCurrency | "">("");
   const [budgetRangeId, setBudgetRangeId] = useState("");
   const [propertyType, setPropertyType] = useState<PropertyType | "">("");
@@ -26,24 +28,29 @@ export function PropertySearch({ onSearch, isSearching }: PropertySearchProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const params = buildPropertySearchParams({
+    const state: PropertySearchFormState = {
       currency: currency || undefined,
       budgetRangeId: budgetRangeId || undefined,
       propertyType: propertyType || undefined,
       search: search || undefined,
       location: location || undefined,
       bedrooms: bedrooms ? Number(bedrooms) : undefined,
-      page: 1,
       limit: 12,
-    });
+    };
+
+    const params = buildPropertySearchParams(state);
 
     trackEvent("property_search_submitted", {
-      currency: params.currency,
-      budget: params.budget,
-      type: params.type,
-      search: params.search,
-      location: params.location,
+      area: params.area,
+      city: params.city,
+      propertyTypeCode: params.propertyTypeCode,
+      bedrooms: params.bedrooms,
     });
+
+    if (redirectMode) {
+      onSearch(state);
+      return;
+    }
 
     onSearch(params);
   };

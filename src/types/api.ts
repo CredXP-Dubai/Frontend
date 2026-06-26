@@ -102,82 +102,36 @@ export interface PaginatedResponse<T> {
   meta: PaginatedMeta;
 }
 
-// ─── Properties / Developers / Projects ─────────────────────────────────────────
-// NOTE: These endpoints are NOT deployed on backend v0.3.0 (verified 404).
-// Types are defined for forward compatibility when the backend adds them.
+// ─── Catalog (developers, projects, properties) — API v1.0.0 ────────────────
 
-export interface Property {
-  id: string;
-  title: string;
-  slug?: string;
-  description?: string;
-  price: number;
-  currency?: string;
-  location?: string;
-  bedrooms?: number;
-  bathrooms?: number;
-  areaSqft?: number;
-  status?: string;
-  featured?: boolean;
-  developerId?: string;
-  projectId?: string;
-  images?: string[];
-  createdAt?: string;
-  updatedAt?: string;
-}
+export type {
+  CodeNameRef,
+  CurrencyRef,
+  DeveloperRef,
+  ProjectRef,
+  StatusRef,
+  MediaItem,
+  LocationRef,
+  PaymentPlan,
+  CursorPaginatedMeta,
+  CursorPaginatedResponse,
+  DeveloperListItem,
+  DeveloperDetail,
+  DeveloperListParams,
+  ProjectListItem,
+  ProjectDetail,
+  ProjectListParams,
+  PropertyListItem,
+  PropertyDetail,
+  PropertyListParams,
+  PropertySort,
+} from "./catalog";
 
-export interface PropertyListParams {
-  page?: number;
-  limit?: number;
-  search?: string;
-  location?: string;
-  type?: string;
-  currency?: string;
-  budget?: number;
-  minPrice?: number;
-  maxPrice?: number;
-  bedrooms?: number;
-  developerId?: string;
-  projectId?: string;
-  featured?: boolean;
-  sort?: string;
-}
+/** @deprecated Use PropertyListItem */
+export type Property = import("./catalog").PropertyListItem;
 
-export interface Developer {
-  id: string;
-  name: string;
-  slug?: string;
-  description?: string;
-  logoUrl?: string;
-  website?: string;
-  projectCount?: number;
-  createdAt?: string;
-}
+/** @deprecated Use DeveloperListItem */
+export type Developer = import("./catalog").DeveloperListItem;
 
-export interface DeveloperListParams {
-  page?: number;
-  limit?: number;
-  search?: string;
-}
-
-export interface Project {
-  id: string;
-  name: string;
-  slug?: string;
-  description?: string;
-  developerId?: string;
-  location?: string;
-  status?: string;
-  completionDate?: string;
-  images?: string[];
-  propertyCount?: number;
-  createdAt?: string;
-}
-
-export interface ProjectListParams {
-  page?: number;
-  limit?: number;
-  search?: string;
-  developerId?: string;
-  status?: string;
-}
+/** @deprecated Use ProjectListItem */
+export type Project = import("./catalog").ProjectListItem;

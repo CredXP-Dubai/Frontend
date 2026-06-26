@@ -5,13 +5,17 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
+import { usePermissions } from "@/hooks/usePermissions";
 import { getDisplayName, getUserInitials } from "@/lib/auth/utils";
+import { readString, asRecord } from "@/utils/record";
 import { Button } from "@/components/ui/Button";
 import { theme } from "@/styles/theme";
 
 const navLinks = [
-  { href: "/#properties", label: "Properties" },
-  { href: "/#developers", label: "Developers" },
+  { href: "/properties", label: "Properties" },
+  { href: "/projects", label: "Projects" },
+  { href: "/developers", label: "Developers" },
+  { href: "/search", label: "Search" },
   { href: "/#consultation", label: "Advisory" },
 ] as const;
 
@@ -41,6 +45,7 @@ export function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { currentUser, isAuthenticated, loading, logout } = useAuth();
+  const { permissions, loading: permissionsLoading } = usePermissions();
   const [menuOpen, setMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
@@ -51,7 +56,8 @@ export function Navbar() {
     pathname === "/login" ||
     pathname === "/register" ||
     pathname === "/forgot-password" ||
-    pathname === "/reset-password";
+    pathname === "/reset-password" ||
+    pathname === "/unauthorized";
 
   useEffect(() => {
     if (!isHome) {
@@ -86,6 +92,20 @@ export function Navbar() {
     }
   }
 
+  const accountMenuItems = [
+    ...(!permissionsLoading && permissions.canAccessWorkspace
+      ? [{ href: "/workspace", label: "Workspace" }]
+      : []),
+    ...(!permissionsLoading && permissions.canAccessInvestorPortal
+      ? [
+          { href: "/dashboard", label: "Dashboard" },
+          { href: "/profile", label: "Profile" },
+          { href: "/saved-properties", label: "Saved Properties" },
+          { href: "/settings", label: "Settings" },
+        ]
+      : []),
+  ];
+
   return (
     <header className={headerClass}>
       <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-4 px-[clamp(1.25rem,4vw,2rem)] py-4">
@@ -110,8 +130,11 @@ export function Navbar() {
           {navLinks.map((link) => (
             <NavLink key={link.href} {...link} onDark={onHero} />
           ))}
-          {isAuthenticated && (
+          {!permissionsLoading && isAuthenticated && permissions.canAccessInvestorPortal && (
             <NavLink href="/dashboard" label="Portal" onDark={onHero} />
+          )}
+          {!permissionsLoading && isAuthenticated && permissions.canAccessWorkspace && (
+            <NavLink href="/workspace" label="Workspace" onDark={onHero} />
           )}
         </nav>
 
@@ -144,13 +167,10 @@ export function Navbar() {
                     role="menu"
                   >
                     <p className="px-2 text-sm font-semibold text-black">{getDisplayName(currentUser)}</p>
-                    <p className="mb-2 px-2 text-xs text-black/45">{currentUser.email}</p>
-                    {[
-                      { href: "/dashboard", label: "Dashboard" },
-                      { href: "/profile", label: "Profile" },
-                      { href: "/saved-properties", label: "Saved Properties" },
-                      { href: "/settings", label: "Settings" },
-                    ].map((item) => (
+                    <p className="mb-2 px-2 text-xs text-black/45">
+                      {readString(asRecord(currentUser), "email")}
+                    </p>
+                    {accountMenuItems.map((item) => (
                       <Link
                         key={item.href}
                         href={item.href}
@@ -234,9 +254,16 @@ export function Navbar() {
               ))}
               {isAuthenticated ? (
                 <>
-                  <Link href="/dashboard" className="block py-3 text-sm" onClick={() => setMenuOpen(false)}>
-                    Portal
-                  </Link>
+                  {!permissionsLoading && permissions.canAccessInvestorPortal && (
+                    <Link href="/dashboard" className="block py-3 text-sm" onClick={() => setMenuOpen(false)}>
+                      Portal
+                    </Link>
+                  )}
+                  {!permissionsLoading && permissions.canAccessWorkspace && (
+                    <Link href="/workspace" className="block py-3 text-sm" onClick={() => setMenuOpen(false)}>
+                      Workspace
+                    </Link>
+                  )}
                   <button type="button" className="block py-3 text-sm text-[#C8102E]" onClick={handleLogout}>
                     Logout
                   </button>

@@ -2,6 +2,7 @@
 
 import { useAuth } from "@/context/AuthContext";
 import { getDisplayName } from "@/lib/auth/utils";
+import { asRecord, readString } from "@/utils/record";
 import { PortalShell } from "@/components/layout/PortalShell";
 import { Reveal } from "@/components/ui/Reveal";
 
@@ -10,15 +11,16 @@ export default function ProfilePage() {
 
   if (!currentUser) return null;
 
+  const user = asRecord(currentUser);
   const fields = [
     { label: "Name", value: getDisplayName(currentUser) },
-    { label: "Email", value: currentUser.email },
-    { label: "Status", value: currentUser.status ?? "—" },
-    { label: "User ID", value: currentUser.id },
+    { label: "Email", value: readString(user, "email") || "—" },
+    { label: "Status", value: readString(user, "status") || "—" },
+    { label: "User ID", value: readString(user, "id") || "—" },
     {
       label: "Member Since",
-      value: currentUser.createdAt
-        ? new Date(currentUser.createdAt).toLocaleDateString("en-AE", {
+      value: readString(user, "createdAt")
+        ? new Date(readString(user, "createdAt")).toLocaleDateString("en-AE", {
             year: "numeric",
             month: "long",
             day: "numeric",

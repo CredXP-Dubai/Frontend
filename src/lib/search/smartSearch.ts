@@ -1,4 +1,4 @@
-import type { PropertyListParams } from "@/types/api";
+import type { PropertyListParams, PropertySort } from "@/types/catalog";
 import type { SupportedCurrency } from "./currency";
 import { resolveBudgetRange, type PropertyType } from "./budgetRanges";
 
@@ -12,68 +12,59 @@ export interface PropertySearchFormState extends SmartSearchCriteria {
   search?: string;
   location?: string;
   bedrooms?: number;
-  page?: number;
+  cursor?: string;
   limit?: number;
-}
-
-const DEFAULT_CURRENCY: SupportedCurrency = "AED";
-
-/** @deprecated Use hasActiveSearchFilters — kept for analytics if needed */
-export function isSmartSearchComplete(
-  criteria: Partial<SmartSearchCriteria>,
-): criteria is Required<SmartSearchCriteria> {
-  return Boolean(criteria.currency && criteria.budgetRangeId && criteria.propertyType);
+  sort?: PropertySort;
 }
 
 export function hasActiveSearchFilters(params: PropertyListParams): boolean {
   return Boolean(
-    params.search ||
-      params.location ||
-      params.type ||
-      params.budget ||
-      params.currency ||
+    params.area ||
+      params.city ||
+      params.propertyTypeCode ||
       params.bedrooms ||
-      params.minPrice ||
-      params.maxPrice ||
-      params.developerId ||
-      params.projectId,
+      params.priceMin ||
+      params.priceMax ||
+      params.developerSlug ||
+      params.projectSlug ||
+      params.availability,
   );
 }
 
 /**
- * Builds API query params — only includes fields that have values.
- * Currency defaults to AED when a budget filter is applied.
+ * Maps form state to backend property search query params.
  */
 export function buildPropertySearchParams(
   state: PropertySearchFormState,
 ): PropertyListParams {
   const params: PropertyListParams = {
-    page: state.page ?? 1,
+    cursor: state.cursor,
     limit: state.limit ?? 12,
+    sort: state.sort,
   };
 
   const search = state.search?.trim();
-  if (search) params.search = search;
+  if (search) params.area = search;
 
   const location = state.location?.trim();
-  if (location) params.location = location;
+  if (location) params.city = location;
 
   if (state.bedrooms) params.bedrooms = state.bedrooms;
 
-  if (state.propertyType) params.type = state.propertyType;
+  if (state.propertyType) {
+    params.propertyTypeCode = state.propertyType.toUpperCase();
+  }
 
   if (state.budgetRangeId) {
     const range = resolveBudgetRange(state.budgetRangeId);
     if (range) {
-      params.budget = range.maxAed ?? range.minAed;
-      params.currency = state.currency ?? DEFAULT_CURRENCY;
+      if (range.minAed) params.priceMin = range.minAed;
+      if (range.maxAed) params.priceMax = range.maxAed;
     }
-  } else if (state.currency) {
-    params.currency = state.currency;
   }
 
-  if (!hasActiveSearchFilters(params)) {
-    params.sort = "featured,-createdAt";
+  if (!hasActiveSearchFilters(params) && !params.sort) {
+    params.sort = "newest";
   }
 
   return params;

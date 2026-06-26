@@ -1,9 +1,10 @@
 /**
  * CredXP SOW domain models — single source of truth for platform entities.
- * API transport types live in `api.ts`; extend here for full product shape.
+ * API transport types live in `catalog.ts`; extend here for full product shape.
  */
 
-import type { Property, Developer, User } from "./api";
+import type { User } from "./api";
+import type { DeveloperListItem, PropertyListItem } from "./catalog";
 
 // ─── Theme (SOW: Admin Theme Management + Developer CMS) ─────────────────────
 
@@ -80,29 +81,33 @@ export interface InvestmentComparisonResult {
   higherYieldMarket: "dubai" | "india";
 }
 
-// ─── Property Detail (SOW: Property Details page) ──────────────────────────
+// ─── Property Detail (SOW extensions beyond API) ───────────────────────────
 
-export interface PropertyDetail extends Property {
+export interface PropertySowDetail extends PropertyListItem {
   brochureUrl?: string;
   virtualTour?: VirtualTour;
   verification?: VerificationData;
   roi?: RoiData;
-  amenities?: string[];
   floorPlans?: string[];
   latitude?: number;
   longitude?: number;
-  propertyType?: string;
 }
 
-// ─── Developer Detail (SOW: Developer Pages + Dynamic Theming) ─────────────
+/** @deprecated Use PropertySowDetail */
+export type PropertyDetail = PropertySowDetail;
 
-export interface DeveloperDetail extends Developer {
+// ─── Developer Detail (SOW extensions beyond API) ──────────────────────────
+
+export interface DeveloperSowDetail extends DeveloperListItem {
   theme?: ThemeTokens;
   verification?: VerificationData;
   primaryColor?: string;
   secondaryColor?: string;
   accentColor?: string;
 }
+
+/** @deprecated Use DeveloperSowDetail */
+export type DeveloperDetail = DeveloperSowDetail;
 
 // ─── Leads (SOW: Progressive Lead Capture + CRM) ───────────────────────────
 

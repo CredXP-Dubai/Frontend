@@ -5,9 +5,9 @@ const columns = [
     title: "CredXP Dubai",
     links: [
       { label: "About", href: "/#consultation" },
-      { label: "Properties", href: "/#properties" },
-      { label: "Developers", href: "/#developers" },
-      { label: "Private Advisory", href: "/#consultation" },
+      { label: "Properties", href: "/properties" },
+      { label: "Projects", href: "/projects" },
+      { label: "Developers", href: "/developers" },
     ],
   },
   {
@@ -20,12 +20,12 @@ const columns = [
     ],
   },
   {
-    title: "Developers",
+    title: "Discover",
     links: [
-      { label: "Emaar", href: "/#developers" },
-      { label: "DAMAC", href: "/#developers" },
-      { label: "Sobha Realty", href: "/#developers" },
-      { label: "Meraas", href: "/#developers" },
+      { label: "Search", href: "/search" },
+      { label: "Featured Properties", href: "/properties" },
+      { label: "Off-Plan Projects", href: "/projects" },
+      { label: "Private Advisory", href: "/#consultation" },
     ],
   },
   {

@@ -1,13 +1,13 @@
 "use client";
 
 import { useFeaturedProperties } from "@/hooks/useProperties";
-import { ApiState } from "@/components/ui/ApiState";
+import { CatalogPageState } from "@/components/catalog/CatalogPageState";
+import { PropertyCard } from "@/components/catalog/PropertyCard";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Reveal } from "@/components/ui/Reveal";
-import { PropertyCard } from "./PropertyCard";
 
 export function FeaturedProperties() {
-  const { data, isLoading, isError, error } = useFeaturedProperties(6);
+  const { data, isLoading, isError, error, refetch } = useFeaturedProperties(6);
 
   return (
     <section
@@ -21,25 +21,26 @@ export function FeaturedProperties() {
         eyebrow="Curated Selection"
         title="Featured Properties"
         subtitle="Handpicked residences from Dubai's most prestigious developers and landmark destinations."
+        action={{ label: "View All Properties", href: "/properties" }}
       />
 
-      <ApiState
+      <CatalogPageState
         isLoading={isLoading}
         isError={isError}
         error={error}
+        onRetry={() => refetch()}
         isEmpty={!isLoading && !isError && (data?.data?.length ?? 0) === 0}
-        loadingMessage="Loading featured properties…"
         emptyTitle="No featured properties"
-        emptyMessage="Featured listings will appear when the properties API is live."
+        emptyMessage="Featured listings will appear when available from the API."
       >
         <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
           {data?.data.map((property, index) => (
-            <Reveal key={property.id} delay={index * 0.08}>
-              <PropertyCard property={property} />
+            <Reveal key={property.slug} delay={index * 0.08}>
+              <PropertyCard property={property} featured />
             </Reveal>
           ))}
         </div>
-      </ApiState>
+      </CatalogPageState>
     </section>
   );
 }

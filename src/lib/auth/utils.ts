@@ -1,4 +1,5 @@
 import { ApiError } from "@/lib/api/client";
+import { asRecord, readString } from "@/utils/record";
 
 export function getErrorMessage(error: unknown, fallback = "Something went wrong"): string {
   if (error instanceof ApiError) return error.message;
@@ -27,20 +28,16 @@ export function passwordsMatch(password: string, confirmPassword: string): boole
   return password === confirmPassword;
 }
 
-export function getDisplayName(user: {
-  firstName?: string;
-  lastName?: string;
-  email: string;
-}): string {
-  const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ").trim();
-  return fullName || user.email;
+export function getDisplayName(user: unknown): string {
+  const r = asRecord(user);
+  const firstName = readString(r, "firstName");
+  const lastName = readString(r, "lastName");
+  const email = readString(r, "email");
+  const fullName = [firstName, lastName].filter(Boolean).join(" ").trim();
+  return fullName || email || "User";
 }
 
-export function getUserInitials(user: {
-  firstName?: string;
-  lastName?: string;
-  email: string;
-}): string {
+export function getUserInitials(user: unknown): string {
   const displayName = getDisplayName(user);
   const parts = displayName.split(/\s+/).filter(Boolean);
 

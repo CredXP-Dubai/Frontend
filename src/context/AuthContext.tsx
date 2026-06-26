@@ -29,7 +29,7 @@ import {
 } from "@/lib/auth/session";
 import { isStrongPassword, isValidEmail, passwordsMatch } from "@/lib/auth/utils";
 import { queryKeys } from "@/lib/query/keys";
-import type { User } from "@/types/api";
+import type { User } from "@/types/auth";
 import type {
   AuthContextValue,
   ForgotPasswordFormValues,

@@ -1,4 +1,7 @@
-import type { AuthTokenResponse, User } from "@/types/api";
+import type { AuthMeResponse, AuthTokenResponse } from "@/types/openapi-helpers";
+import { asRecord, readString } from "@/utils/record";
+
+export type User = AuthMeResponse;
 
 export interface AuthSession {
   accessToken: string;
